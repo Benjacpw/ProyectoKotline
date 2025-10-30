@@ -8,8 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
@@ -57,11 +59,15 @@ fun LoginScreen(navController: NavHostController) {
                     when {
                         username == "admin" && password == "admin123" -> {
                             errorMessage = ""
-                            navController.navigate("home_admin")
+                            navController.navigate("menu/admin") {
+                                popUpTo("login") { inclusive = true }
+                            }
                         }
                         username == "user" && password == "user123" -> {
                             errorMessage = ""
-                            navController.navigate("home_user")
+                            navController.navigate("menu/user") {
+                                popUpTo("login") { inclusive = true }
+                            }
                         }
                         else -> {
                             errorMessage = "Credenciales incorrectas"
@@ -79,4 +85,10 @@ fun LoginScreen(navController: NavHostController) {
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen(navController = rememberNavController())
 }
