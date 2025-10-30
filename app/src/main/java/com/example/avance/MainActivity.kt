@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AvanceTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    AppNavigation()  // ✅ Usa el NavHost correcto
+                    AppNavigation()
                 }
             }
         }

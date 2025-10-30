@@ -28,7 +28,7 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = "Bienvenido a Avance",
+                text = "Bienvenido a ExtremeShop",
                 style = MaterialTheme.typography.titleLarge,
                 fontSize = 22.sp
             )

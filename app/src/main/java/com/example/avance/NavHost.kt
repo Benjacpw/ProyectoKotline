@@ -52,11 +52,11 @@ fun AppNavigation() {
             DetalleProductoScreen(
                 productoId = id,
                 viewModel = productosViewModel,
-                carritoViewModel = carritoViewModel, // ✅ ahora se lo pasamos
+                carritoViewModel = carritoViewModel,
                 navController = navController
             )
         }
 
-        composable("quienes_somos") { QuienesSomosScreen() }
+        composable("quienes_somos") { QuienesSomosScreen(navController) }
     }
 }

@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -22,6 +24,14 @@ fun CatalogoScreen(productosViewModel: ProductosViewModel, navController: NavCon
         topBar = {
             TopAppBar(
                 title = { Text("🛍 Catálogo de Productos") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.primaryContainer)
             )
         }
@@ -67,3 +77,4 @@ fun ProductoCatalogoItem(producto: Producto, onClick: () -> Unit) {
         }
     }
 }
+
