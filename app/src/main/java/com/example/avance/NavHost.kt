@@ -25,12 +25,10 @@ fun AppNavigation() {
         composable("login") { LoginScreen(navController) }
         composable("home_admin") { HomeScreen(navController, isAdmin = true) }
         composable("home_user") { HomeScreen(navController, isAdmin = false) }
-        composable("productos") { ProductosScreen(viewModel = productosViewModel) }
+        composable("productos") {
+            ProductosScreen(viewModel = productosViewModel, navController = navController)
+        }
         composable("catalogo") { CatalogoScreen(productosViewModel, navController) }
         composable("quienes_somos") { QuienesSomosScreen() }
     }
-
 }
-
-
-
