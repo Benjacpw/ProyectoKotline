@@ -10,6 +10,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.avance.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,4 +43,10 @@ fun QuienesSomosScreen() {
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun QuienesSomosScreenPreview() {
+    QuienesSomosScreen()
 }

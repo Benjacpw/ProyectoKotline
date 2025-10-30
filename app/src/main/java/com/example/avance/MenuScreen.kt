@@ -58,5 +58,6 @@ fun MenuScreen(navController: NavHostController, isAdmin: Boolean) {
 @Preview(showBackground = true)
 @Composable
 fun MenuScreenPreview() {
-    MenuScreen(navController = rememberNavController(), isAdmin = true)
+    val navController = rememberNavController()
+    MenuScreen(navController = navController, isAdmin = true) // o false
 }
