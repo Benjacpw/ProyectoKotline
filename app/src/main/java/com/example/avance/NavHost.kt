@@ -22,15 +22,14 @@ fun AppNavigation() {
         viewModel(factory = ProductosViewModel.Factory(repo))
 
     NavHost(navController, startDestination = "login") {
-
         composable("login") { LoginScreen(navController) }
-
         composable("home_admin") { HomeScreen(navController, isAdmin = true) }
         composable("home_user") { HomeScreen(navController, isAdmin = false) }
-
-        composable("quienes_somos") { QuienesSomosScreen() }
         composable("productos") { ProductosScreen(viewModel = productosViewModel) }
+        composable("catalogo") { CatalogoScreen(productosViewModel, navController) }
+        composable("quienes_somos") { QuienesSomosScreen() }
     }
+
 }
 
 

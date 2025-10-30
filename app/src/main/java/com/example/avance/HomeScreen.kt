@@ -33,12 +33,17 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
                 fontSize = 22.sp
             )
 
-            // Botón Productos
             Button(
-                onClick = { navController.navigate("productos") },
+                onClick = {
+                    if (isAdmin) {
+                        navController.navigate("productos") // CRUD admin
+                    } else {
+                        navController.navigate("catalogo") // Catálogo usuario
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("🛍️ Ver Productos")
+                Text(if (isAdmin) "📦 Gestionar Productos" else "🛍 Ver Productos")
             }
 
             // Botón Quiénes Somos
@@ -46,22 +51,16 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
                 onClick = { navController.navigate("quienes_somos") },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("ℹ️ Quiénes Somos")
-            }
-
-            // Solo admins
-            if (isAdmin) {
-                Button(
-                    onClick = { navController.navigate("home_admin") },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("⚙️ Panel de Administración")
-                }
+                Text("Quiénes Somos")
             }
 
             // Cerrar sesión
             OutlinedButton(
-                onClick = { navController.navigate("login") },
+                onClick = {
+                    navController.navigate("login") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("🚪 Cerrar Sesión")
@@ -69,3 +68,4 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
         }
     }
 }
+

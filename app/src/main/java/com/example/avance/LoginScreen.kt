@@ -59,7 +59,7 @@ fun LoginScreen(navController: NavHostController) {
                     when {
                         username == "admin" && password == "admin123" -> {
                             errorMessage = ""
-                            navController.navigate("home_admin") {
+                            navController.navigate("productos") {
                                 popUpTo("login") { inclusive = true }
                             }
                         }
