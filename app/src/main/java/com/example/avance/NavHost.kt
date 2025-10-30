@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.avance.data.ProductRepository
-import com.example.avance.data.AppDatabase  // o el nombre real de tu base
+import com.example.avance.data.AppDatabase
 import com.example.avance.viewmodel.ProductosViewModel
 
 @Composable
@@ -22,12 +22,16 @@ fun AppNavigation() {
         viewModel(factory = ProductosViewModel.Factory(repo))
 
     NavHost(navController, startDestination = "login") {
+
         composable("login") { LoginScreen(navController) }
-        composable("home_admin") { AdminHomeScreen(navController) }
-        composable("home_user") { UserHomeScreen(navController) }
+
+        composable("home_admin") { HomeScreen(navController, isAdmin = true) }
+        composable("home_user") { HomeScreen(navController, isAdmin = false) }
+
         composable("quienes_somos") { QuienesSomosScreen() }
         composable("productos") { ProductosScreen(viewModel = productosViewModel) }
     }
 }
+
 
 
