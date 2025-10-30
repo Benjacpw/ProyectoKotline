@@ -1,6 +1,5 @@
 package com.example.avance
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -36,11 +35,9 @@ fun MenuScreen(navController: NavHostController, isAdmin: Boolean) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            }
 
             // 👇 Solo visible para admin
             if (isAdmin) {
-                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = { navController.navigate("panel_admin") },
                     modifier = Modifier.fillMaxWidth(),
@@ -51,9 +48,18 @@ fun MenuScreen(navController: NavHostController, isAdmin: Boolean) {
                     Text("Panel de Administración")
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = { navController.popBackStack("login", inclusive = false) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Cerrar sesión")
+            }
         }
     }
-
+}
 
 @Preview(showBackground = true)
 @Composable

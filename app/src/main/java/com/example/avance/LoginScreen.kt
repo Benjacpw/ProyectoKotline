@@ -57,19 +57,20 @@ fun LoginScreen(navController: NavHostController) {
             Button(
                 onClick = {
                     when {
-                        username == "admin" && password == "admin123" -> {
-                            errorMessage = ""
-                            navController.navigate("menu/admin") {
-                                popUpTo("login") { inclusive = true }
-                            }
+                    username == "admin" && password == "admin123" -> {
+                        errorMessage = ""
+                        navController.navigate("home_admin") {
+                            popUpTo("login") { inclusive = true }
                         }
-                        username == "user" && password == "user123" -> {
-                            errorMessage = ""
-                            navController.navigate("menu/user") {
-                                popUpTo("login") { inclusive = true }
-                            }
+                    }
+                    username == "user" && password == "user123" -> {
+                        errorMessage = ""
+                        navController.navigate("home_user") {
+                            popUpTo("login") { inclusive = true }
                         }
-                        else -> {
+                    }
+
+                    else -> {
                             errorMessage = "Credenciales incorrectas"
                         }
                     }

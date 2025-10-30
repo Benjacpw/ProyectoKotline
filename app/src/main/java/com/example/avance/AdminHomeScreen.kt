@@ -25,13 +25,18 @@ fun AdminHomeScreen(navController: NavHostController) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Bienvenido, Administrador 🔑", style = MaterialTheme.typography.headlineSmall)
                 Spacer(modifier = Modifier.height(20.dp))
-                Button(onClick = { navController.popBackStack("login", inclusive = false) }) {
+                Button(onClick = { navController.navigate("quienes_somos") }) {
+                    Text("Ir a Quiénes Somos")
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                OutlinedButton(onClick = { navController.popBackStack("login", inclusive = false) }) {
                     Text("Cerrar sesión")
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
