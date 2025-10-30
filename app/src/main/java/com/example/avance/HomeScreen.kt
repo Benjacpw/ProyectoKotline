@@ -46,26 +46,35 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
                 Text(if (isAdmin) "📦 Gestionar Productos" else "🛍 Ver Productos")
             }
 
-            // Botón Quiénes Somos
+            if (!isAdmin) {
+                Button(
+                    onClick = { navController.navigate("carrito") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("🛒 Ver Carrito")
+                }
+            }
+
             Button(
                 onClick = { navController.navigate("quienes_somos") },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Quiénes Somos")
+                Text("👥 Quiénes Somos")
             }
 
-            // Cerrar sesión
             OutlinedButton(
                 onClick = {
                     navController.navigate("login") {
                         popUpTo("login") { inclusive = true }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                )
             ) {
                 Text("🚪 Cerrar Sesión")
             }
         }
     }
 }
-

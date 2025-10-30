@@ -42,7 +42,7 @@ fun CatalogoScreen(productosViewModel: ProductosViewModel, navController: NavCon
                 items(lista) { producto ->
                     ProductoCatalogoItem(
                         producto = producto,
-                        onClick = { /* Más adelante: abrir detalle */ }
+                        onClick = { navController.navigate("detalle/${producto.id}") }
                     )
                 }
             }

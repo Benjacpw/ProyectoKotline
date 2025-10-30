@@ -20,7 +20,6 @@ class ProductosViewModel(private val repo: ProductRepository) : ViewModel() {
     fun eliminar(producto: Producto) = viewModelScope.launch { repo.eliminar(producto) }
     suspend fun obtener(id: Long): Producto? = repo.obtener(id)
 
-    // ✅ Factory para poder crearlo desde Compose
     class Factory(private val repo: ProductRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
