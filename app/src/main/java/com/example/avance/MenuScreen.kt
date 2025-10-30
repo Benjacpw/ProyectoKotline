@@ -36,7 +36,6 @@ fun MenuScreen(navController: NavHostController, isAdmin: Boolean) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 👇 Solo visible para admin
             if (isAdmin) {
                 Button(
                     onClick = { navController.navigate("panel_admin") },

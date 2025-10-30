@@ -19,7 +19,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 fun DetalleProductoScreen(
     productoId: Long,
     viewModel: ProductosViewModel,
-    carritoViewModel: CarritoViewModel, // 👈 ahora recibimos el carrito
+    carritoViewModel: CarritoViewModel,
     navController: NavController
 ) {
     val productos by viewModel.productos.collectAsState(initial = emptyList())
@@ -59,7 +59,6 @@ fun DetalleProductoScreen(
                 Button(
                     onClick = {
                         scope.launch {
-                            // 👇 Crear el objeto para guardar en Room
                             val nuevoItem = CarritoItem(
                                 idProducto = it.id,
                                 nombre = it.nombre,
@@ -67,7 +66,7 @@ fun DetalleProductoScreen(
                                 cantidad = 1
                             )
 
-                            carritoViewModel.agregar(nuevoItem) // 👈 guardamos realmente
+                            carritoViewModel.agregar(nuevoItem)
                             snackbarHostState.showSnackbar("✅ ${it.nombre} agregado al carrito")
                         }
                     },
