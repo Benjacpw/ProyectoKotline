@@ -27,6 +27,7 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+
             Text(
                 text = "Bienvenido a ExtremeShop",
                 style = MaterialTheme.typography.titleLarge,
@@ -36,14 +37,21 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
             Button(
                 onClick = {
                     if (isAdmin) {
-                        navController.navigate("productos") // CRUD admin
+                        navController.navigate("productos")
                     } else {
-                        navController.navigate("catalogo") // Catálogo usuario
+                        navController.navigate("catalogo")
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(if (isAdmin) "📦 Gestionar Productos" else "🛍 Ver Productos")
+            }
+
+            Button(
+                onClick = { navController.navigate("usuarios_api") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("🌐 Usuarios desde API")
             }
 
             if (!isAdmin) {

@@ -47,6 +47,7 @@ fun AppNavigation() {
                 navController = navController
             )
         }
+
         composable("detalle/{id}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id")?.toLongOrNull() ?: 0L
             DetalleProductoScreen(
@@ -56,7 +57,8 @@ fun AppNavigation() {
                 navController = navController
             )
         }
-
         composable("quienes_somos") { QuienesSomosScreen(navController) }
+
+        composable("usuarios_api") { UsuariosApiScreen(navController) }
     }
 }
