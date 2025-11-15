@@ -21,4 +21,23 @@ interface ApiService {
 
     @DELETE("api/usuarios/{id}")
     suspend fun deleteUsuario(@Path("id") id: Long)
+
+    @GET("api/productos")
+    suspend fun getProductos(): List<Producto>
+
+    @GET("api/productos/{id}")
+    suspend fun getProductoById(@Path("id") id: Long): Producto
+
+    @POST("api/productos")
+    suspend fun createProducto(@Body producto: ProductoCreate): Producto
+
+
+    @PUT("api/productos/{id}")
+    suspend fun updateProducto(
+        @Path("id") id: Long,
+        @Body producto: ProductoCreate
+    ): Producto
+
+    @DELETE("api/productos/{id}")
+    suspend fun deleteProducto(@Path("id") id: Long)
 }

@@ -1,7 +1,6 @@
 package com.example.avance.data
 
-data class Producto(
-    val id: Long,
+data class ProductoCreate(
     val titulo: String,
     val descripcion: String,
     val precio: Double,
@@ -9,4 +8,3 @@ data class Producto(
     val qty: Int,
     val categoria: String
 )
-

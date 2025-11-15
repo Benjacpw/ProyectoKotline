@@ -21,11 +21,11 @@ fun CarritoScreen(
     viewModel: CarritoViewModel,
     navController: NavController
 ) {
-    val carrito by viewModel.carrito.collectAsState(initial = emptyList())
+    val carrito by viewModel.carrito.collectAsState()
+    val total = carrito.sumOf { it.precio * it.cantidad }
+
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val total = carrito.sumOf { it.precio * it.cantidad }
 
     Scaffold(
         topBar = {
@@ -40,6 +40,7 @@ fun CarritoScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
+
         if (carrito.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -56,20 +57,20 @@ fun CarritoScreen(
                     .padding(16.dp)
                     .fillMaxSize()
             ) {
-                LazyColumn(
-                    modifier = Modifier.weight(1f)
-                ) {
+                LazyColumn(modifier = Modifier.weight(1f)) {
                     items(carrito) { item ->
                         CarritoItemView(
                             item = item,
                             onAdd = {
                                 val actualizado = item.copy(cantidad = item.cantidad + 1)
-                                viewModel.actualizar(actualizado)
+                                viewModel.eliminar(item)
+                                viewModel.agregar(actualizado)
                             },
                             onRemove = {
                                 if (item.cantidad > 1) {
                                     val actualizado = item.copy(cantidad = item.cantidad - 1)
-                                    viewModel.actualizar(actualizado)
+                                    viewModel.eliminar(item)
+                                    viewModel.agregar(actualizado)
                                 } else {
                                     viewModel.eliminar(item)
                                     scope.launch {
@@ -81,11 +82,16 @@ fun CarritoScreen(
                     }
                 }
 
-                Divider(thickness = 1.dp)
+                Divider()
                 Spacer(Modifier.height(8.dp))
-                Text("💰 Total: $${"%.2f".format(total)}", style = MaterialTheme.typography.titleLarge)
+
+                Text(
+                    "💰 Total: $${"%.2f".format(total)}",
+                    style = MaterialTheme.typography.titleLarge
+                )
 
                 Spacer(Modifier.height(12.dp))
+
                 Button(
                     onClick = {
                         viewModel.limpiar()
@@ -102,8 +108,13 @@ fun CarritoScreen(
     }
 }
 
+
 @Composable
-fun CarritoItemView(item: CarritoItem, onAdd: () -> Unit, onRemove: () -> Unit) {
+fun CarritoItemView(
+    item: CarritoItem,
+    onAdd: () -> Unit,
+    onRemove: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,6 +128,7 @@ fun CarritoItemView(item: CarritoItem, onAdd: () -> Unit, onRemove: () -> Unit) 
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(item.nombre, style = MaterialTheme.typography.titleMedium)
                 Text("Precio unitario: $${item.precio}")

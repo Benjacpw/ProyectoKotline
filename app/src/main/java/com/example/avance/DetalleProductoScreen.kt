@@ -7,12 +7,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.avance.data.CarritoItem
 import com.example.avance.viewmodel.CarritoViewModel
 import com.example.avance.viewmodel.ProductosViewModel
-import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,8 +23,9 @@ fun DetalleProductoScreen(
     carritoViewModel: CarritoViewModel,
     navController: NavController
 ) {
-    val productos by viewModel.productos.collectAsState(initial = emptyList())
+    val productos = viewModel.productos
     val producto = productos.find { it.id == productoId }
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -38,36 +40,48 @@ fun DetalleProductoScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-        producto?.let {
+
+        producto?.let { p ->
+
             Column(
                 modifier = Modifier
                     .padding(padding)
                     .padding(24.dp)
                     .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(it.nombre, style = MaterialTheme.typography.headlineMedium)
-                Text("💰 Precio: \$${it.precio}", style = MaterialTheme.typography.bodyLarge)
-                Text("📂 Categoría: ${it.categoria}")
-                Text("📝 Descripción: ${it.descripcion}")
 
-                Spacer(Modifier.height(32.dp))
+                // IMAGEN GRANDE
+                AsyncImage(
+                    model = p.imagen,
+                    contentDescription = p.titulo,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                )
+
+                Text(p.titulo, style = MaterialTheme.typography.headlineMedium)
+                Text("💰 Precio: $${p.precio}", style = MaterialTheme.typography.titleLarge)
+                Text("📂 Categoría: ${p.categoria}")
+                Text("📝 ${p.descripcion}")
+
+                Spacer(Modifier.height(20.dp))
 
                 Button(
                     onClick = {
                         scope.launch {
-                            val nuevoItem = CarritoItem(
-                                idProducto = it.id,
-                                nombre = it.nombre,
-                                precio = it.precio,
-                                cantidad = 1
+                            carritoViewModel.agregar(
+                                CarritoItem(
+                                    idProducto = p.id,
+                                    nombre = p.titulo,
+                                    precio = p.precio,
+                                    cantidad = 1
+                                )
                             )
-
-                            carritoViewModel.agregar(nuevoItem)
-                            snackbarHostState.showSnackbar("✅ ${it.nombre} agregado al carrito")
+                            snackbarHostState.showSnackbar("🛒 ${p.titulo} agregado al carrito")
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -75,11 +89,14 @@ fun DetalleProductoScreen(
                     Text("🛍 Agregar al carrito")
                 }
             }
-        } ?: Text(
-            "Producto no encontrado",
-            modifier = Modifier.padding(24.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
+
+        } ?: Column(
+            modifier = Modifier
+                .padding(24.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("❌ Producto no encontrado", style = MaterialTheme.typography.bodyLarge)
+        }
     }
 }
-

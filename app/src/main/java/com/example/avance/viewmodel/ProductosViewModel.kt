@@ -1,31 +1,64 @@
 package com.example.avance.viewmodel
 
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.avance.data.ProductRepository
-import com.example.avance.data.Producto
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import com.example.avance.data.*
 import kotlinx.coroutines.launch
 
-class ProductosViewModel(private val repo: ProductRepository) : ViewModel() {
+class ProductosViewModel : ViewModel() {
 
-    val productos: StateFlow<List<Producto>> =
-        repo.productos.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    var productos by mutableStateOf<List<Producto>>(emptyList())
+    var cargando by mutableStateOf(false)
+    var error by mutableStateOf<String?>(null)
 
-    fun agregar(producto: Producto) = viewModelScope.launch { repo.agregar(producto) }
-    fun actualizar(producto: Producto) = viewModelScope.launch { repo.actualizar(producto) }
-    fun eliminar(producto: Producto) = viewModelScope.launch { repo.eliminar(producto) }
-    suspend fun obtener(id: Long): Producto? = repo.obtener(id)
+    fun cargarProductos() {
+        viewModelScope.launch {
+            try {
+                cargando = true
+                productos = RetrofitInstance.api.getProductos()
+                error = null
+            } catch (e: Exception) {
+                error = e.message
+            } finally {
+                cargando = false
+            }
+        }
+    }
 
-    class Factory(private val repo: ProductRepository) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ProductosViewModel(repo) as T
+    fun crearProducto(data: ProductoCreate) {
+        viewModelScope.launch {
+            try {
+                cargando = true
+                RetrofitInstance.api.createProducto(data)
+                cargarProductos()
+            } catch (e: Exception) {
+                error = e.message
+            } finally { cargando = false }
+        }
+    }
+
+    fun actualizarProducto(id: Long, data: ProductoCreate) {
+        viewModelScope.launch {
+            try {
+                cargando = true
+                RetrofitInstance.api.updateProducto(id, data)
+                cargarProductos()
+            } catch (e: Exception) {
+                error = e.message
+            } finally { cargando = false }
+        }
+    }
+
+    fun eliminarProducto(id: Long) {
+        viewModelScope.launch {
+            try {
+                cargando = true
+                RetrofitInstance.api.deleteProducto(id)
+                cargarProductos()
+            } catch (e: Exception) {
+                error = e.message
+            } finally { cargando = false }
         }
     }
 }
-
-

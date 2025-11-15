@@ -11,19 +11,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.avance.data.Producto
 import com.example.avance.viewmodel.ProductosViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogoScreen(productosViewModel: ProductosViewModel, navController: NavController) {
-    val productos by productosViewModel.productos.collectAsState(initial = emptyList())
-    val grouped = productos.groupBy { it.categoria }
 
+    val productos = productosViewModel.productos
+
+    val grouped = productos.groupBy { it.categoria }
+    LaunchedEffect(Unit) {
+        productosViewModel.cargarProductos()
+    }
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("🛍 Catálogo de Productos") },
+                title = { Text("🛍️ Catálogo de Productos") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -31,8 +36,7 @@ fun CatalogoScreen(productosViewModel: ProductosViewModel, navController: NavCon
                             contentDescription = "Volver"
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.primaryContainer)
+                }
             )
         }
     ) { padding ->
@@ -41,15 +45,18 @@ fun CatalogoScreen(productosViewModel: ProductosViewModel, navController: NavCon
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            grouped.forEach { (categoria, lista) ->
+
+            grouped.forEach { (categoriaNombre, productosLista) ->
+
                 item {
                     Text(
-                        text = categoria,
+                        text = categoriaNombre,
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
-                items(lista) { producto ->
+
+                items(productosLista) { producto ->
                     ProductoCatalogoItem(
                         producto = producto,
                         onClick = { navController.navigate("detalle/${producto.id}") }
@@ -62,19 +69,36 @@ fun CatalogoScreen(productosViewModel: ProductosViewModel, navController: NavCon
 
 @Composable
 fun ProductoCatalogoItem(producto: Producto, onClick: () -> Unit) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 6.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
-            Text("💰 Precio: \$${producto.precio}")
-            Text("📂 Categoría: ${producto.categoria}")
-            Text("📝 ${producto.descripcion}")
+
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+
+            // Imagen desde URL
+            AsyncImage(
+                model = producto.imagen,
+                contentDescription = producto.titulo,
+                modifier = Modifier
+                    .size(90.dp)
+                    .padding(4.dp)
+            )
+
+            Column(modifier = Modifier.weight(1f)) {
+
+                Text(producto.titulo, style = MaterialTheme.typography.titleMedium)
+                Text("💰 $${producto.precio}")
+                Text("📂 ${producto.categoria}")
+                Text("📝 ${producto.descripcion}")
+            }
         }
     }
 }
-

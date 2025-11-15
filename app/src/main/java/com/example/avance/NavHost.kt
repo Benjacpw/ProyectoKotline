@@ -1,37 +1,37 @@
 package com.example.avance
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.avance.data.*
 import com.example.avance.viewmodel.*
+import com.example.avance.data.*
+import com.example.avance.*
 
 @Composable
 fun AppNavigation() {
+
     val navController = rememberNavController()
-    val context = LocalContext.current
+    val productosViewModel: ProductosViewModel = viewModel()
+    val carritoViewModel: CarritoViewModel = viewModel()
 
-    val database = AppDatabase.getInstance(context)
-    val productRepo = ProductRepository(database.productoDao())
-    val carritoRepo = CarritoRepository(database.carritoDao())
+    NavHost(navController = navController, startDestination = "login") {
 
-    val factory = AppViewModelFactory(productRepo, carritoRepo)
+        composable("login") {
+            LoginScreen(navController)
+        }
 
-    val productosViewModel: ProductosViewModel = viewModel(factory = factory)
-    val carritoViewModel: CarritoViewModel = viewModel(factory = factory)
+        composable("home_admin") {
+            HomeScreen(navController, isAdmin = true)
+        }
 
-    NavHost(navController, startDestination = "login") {
-
-        composable("login") { LoginScreen(navController) }
-
-        composable("home_admin") { HomeScreen(navController, isAdmin = true) }
-        composable("home_user") { HomeScreen(navController, isAdmin = false) }
+        composable("home_user") {
+            HomeScreen(navController, isAdmin = false)
+        }
 
         composable("productos") {
-            ProductosScreen(viewModel = productosViewModel, navController = navController)
+            ProductosScreen(navController)
         }
 
         composable("catalogo") {
@@ -57,8 +57,13 @@ fun AppNavigation() {
                 navController = navController
             )
         }
-        composable("quienes_somos") { QuienesSomosScreen(navController) }
 
-        composable("usuarios_api") { UsuariosApiScreen(navController) }
+        composable("quienes_somos") {
+            QuienesSomosScreen(navController)
+        }
+
+        composable("usuarios_api") {
+            UsuariosApiScreen(navController)
+        }
     }
 }
