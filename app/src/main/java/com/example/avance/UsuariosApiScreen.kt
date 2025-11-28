@@ -3,6 +3,8 @@ package com.example.avance
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -58,10 +60,18 @@ fun UsuariosApiScreen(navController: NavController) {
                             else -> ""
                         }
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.navigate("home_admin") {
+                            popUpTo("home_admin") { inclusive = true }
+                        }
+                    }) {Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    }
                 }
             )
         }
-    ) { padding ->
+    ){ padding ->
 
         Column(
             modifier = Modifier
@@ -85,7 +95,7 @@ fun UsuariosApiScreen(navController: NavController) {
                     Spacer(Modifier.height(10.dp))
 
                     when {
-                        vm.cargando -> Text("Cargando usuarios...")
+                        vm.cargando -> Text("Cargando usuarios")
                         vm.error != null -> Text(vm.error!!, color = MaterialTheme.colorScheme.error)
                         vm.usuarios.isEmpty() -> Text("No hay usuarios registrados.")
 
@@ -115,7 +125,7 @@ fun UsuariosApiScreen(navController: NavController) {
                                                     },
                                                     modifier = Modifier.weight(1f)
                                                 ) {
-                                                    Text("✏ Editar")
+                                                    Text("✏️ Editar")
                                                 }
 
                                                 Button(
@@ -127,7 +137,7 @@ fun UsuariosApiScreen(navController: NavController) {
                                                         MaterialTheme.colorScheme.error
                                                     )
                                                 ) {
-                                                    Text("🗑 Eliminar")
+                                                    Text("🗑️ Eliminar")
                                                 }
                                             }
                                         }

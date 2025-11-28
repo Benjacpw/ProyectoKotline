@@ -47,11 +47,21 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
                 Text(if (isAdmin) "📦 Gestionar Productos" else "🛍 Ver Productos")
             }
 
-            Button(
-                onClick = { navController.navigate("usuarios_api") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("🌐 Usuarios desde API")
+            if (isAdmin) {
+                Button(
+                    onClick = { navController.navigate("usuarios_api") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("👤Usuarios desde API")
+                }
+            }
+            if (isAdmin) {
+                Button(
+                    onClick = { navController.navigate("categoria_api") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("🏷️ Categoría Productos")
+                }
             }
 
             if (!isAdmin) {
@@ -63,11 +73,13 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
                 }
             }
 
-            Button(
-                onClick = { navController.navigate("quienes_somos") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("👥 Quiénes Somos")
+            if (!isAdmin) {
+                Button(
+                    onClick = { navController.navigate("quienes_somos") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("👥 Quienes Somos")
+                }
             }
 
             OutlinedButton(

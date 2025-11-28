@@ -27,6 +27,8 @@ fun CarritoScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var mostrarCheckout by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,18 +95,34 @@ fun CarritoScreen(
                 Spacer(Modifier.height(12.dp))
 
                 Button(
-                    onClick = {
-                        viewModel.limpiar()
-                        scope.launch {
-                            snackbarHostState.showSnackbar("✅ Compra finalizada correctamente")
-                        }
-                    },
+                    onClick = { mostrarCheckout = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Finalizar Compra")
                 }
             }
         }
+    }
+
+    if (mostrarCheckout) {
+        CheckoutDialog(
+            total = total,
+            onConfirm = { retiroEnTienda, direccion, telefono, comentarios ->
+                val numeroPedido = generarNumeroPedidoAleatorio()
+
+
+                viewModel.limpiar()
+                mostrarCheckout = false
+
+
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        "✅ Tu número de pedido es $numeroPedido. ¡Gracias por elegirnos!"
+                    )
+                }
+            },
+            onDismiss = { mostrarCheckout = false }
+        )
     }
 }
 
@@ -149,4 +167,91 @@ fun CarritoItemView(
             }
         }
     }
+}
+
+
+@Composable
+fun CheckoutDialog(
+    total: Double,
+    onConfirm: (retiroEnTienda: Boolean, direccion: String, telefono: String, comentarios: String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var retiroEnTienda by remember { mutableStateOf(true) }
+    var direccion by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
+    var comentarios by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Datos de envío / retiro") },
+        text = {
+            Column {
+                Text("Total a pagar: $${"%.0f".format(total)}")
+
+                Spacer(Modifier.height(12.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Retiro en tienda")
+                    Spacer(Modifier.width(8.dp))
+                    Switch(
+                        checked = retiroEnTienda,
+                        onCheckedChange = { retiroEnTienda = it }
+                    )
+                }
+
+                if (retiroEnTienda) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "📍 Solo disponible en Mall Plaza Vespucio",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+
+                if (!retiroEnTienda) {
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = direccion,
+                        onValueChange = { direccion = it },
+                        label = { Text("Dirección de envío") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = telefono,
+                    onValueChange = { telefono = it },
+                    label = { Text("Teléfono (opcional)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = comentarios,
+                    onValueChange = { comentarios = it },
+                    label = { Text("Comentarios (opcional)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onConfirm(retiroEnTienda, direccion, telefono, comentarios)
+            }) {
+                Text("Confirmar pedido")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
+}
+
+
+fun generarNumeroPedidoAleatorio(): String {
+    val numero = (100000..999999).random()
+    return "PED-$numero"
 }

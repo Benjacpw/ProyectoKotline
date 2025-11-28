@@ -65,5 +65,11 @@ fun AppNavigation() {
         composable("usuarios_api") {
             UsuariosApiScreen(navController)
         }
+
+        composable("categoria_api") {
+            ApiCategoriasScreen(navController)
+        }
+
+
     }
 }

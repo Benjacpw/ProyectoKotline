@@ -53,8 +53,6 @@ fun DetalleProductoScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                // IMAGEN GRANDE
                 AsyncImage(
                     model = p.imagen,
                     contentDescription = p.titulo,
