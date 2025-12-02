@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.avance.data.RetrofitInstance
 import com.example.avance.viewmodel.CarritoViewModel
 import com.example.avance.viewmodel.ProductosViewModel
 import com.example.avance.viewmodel.UsuariosViewModel
@@ -39,9 +40,11 @@ fun AppNavigation() {
         composable("carrito") {
             CarritoScreen(
                 viewModel = carritoViewModel,
-                navController = navController
+                navController = navController,
+                apiService = RetrofitInstance.api
             )
         }
+
         composable("detalle/{id}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id")?.toLongOrNull() ?: 0L
             DetalleProductoScreen(
@@ -60,5 +63,11 @@ fun AppNavigation() {
         composable("categoria_api") {
             ApiCategoriasScreen(navController)
         }
+
+        composable("ordenes") {
+            OrdenesScreen(navController = navController)
+        }
+
+
     }
 }

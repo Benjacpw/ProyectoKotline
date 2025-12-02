@@ -59,4 +59,13 @@ interface ApiService {
     @DELETE("/api/categorias/{id}")
     suspend fun deleteCategoria(@Path("id") id: Long)
 
+
+    @POST("api/ordenes")
+    suspend fun crearOrden(@Body orden: Orden): Orden
+
+    @GET("api/ordenes")
+    suspend fun obtenerTodasOrdenes(): List<Orden>
+
+
+
 }

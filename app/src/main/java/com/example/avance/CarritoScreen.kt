@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.avance.data.CarritoItem
+import com.example.avance.data.ApiService
 import com.example.avance.viewmodel.CarritoViewModel
 import kotlinx.coroutines.launch
 
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CarritoScreen(
     viewModel: CarritoViewModel,
-    navController: NavController
+    navController: NavController,
+    apiService: ApiService
 ) {
     val carrito by viewModel.carrito.collectAsState()
     val total = carrito.sumOf { it.precio * it.cantidad }
@@ -107,25 +109,35 @@ fun CarritoScreen(
     if (mostrarCheckout) {
         CheckoutDialog(
             total = total,
-            onConfirm = { retiroEnTienda, direccion, telefono, comentarios ->
-                val numeroPedido = generarNumeroPedidoAleatorio()
-
-
-                viewModel.limpiar()
-                mostrarCheckout = false
-
-
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        "✅ Tu número de pedido es $numeroPedido. ¡Gracias por elegirnos!"
-                    )
-                }
+            onConfirm = { nombre, apellido, correo, direccion, comentarios ->
+                viewModel.crearOrden(
+                    nombre = nombre,
+                    apellido = apellido,
+                    correo = correo,
+                    calle = direccion,
+                    departamento = "",
+                    region = "",
+                    comuna = "",
+                    indicaciones = comentarios,
+                    apiService = apiService,
+                    onSuccess = { resultado ->
+                        mostrarCheckout = false
+                        scope.launch {
+                            snackbarHostState.showSnackbar("✅ Pedido creado con ID: ${resultado.id}")
+                        }
+                        viewModel.limpiar()
+                    },
+                    onError = { error ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar("❌ Error: $error")
+                        }
+                    }
+                )
             },
             onDismiss = { mostrarCheckout = false }
         )
     }
 }
-
 
 @Composable
 fun CarritoItemView(
@@ -169,64 +181,53 @@ fun CarritoItemView(
     }
 }
 
-
 @Composable
 fun CheckoutDialog(
     total: Double,
-    onConfirm: (retiroEnTienda: Boolean, direccion: String, telefono: String, comentarios: String) -> Unit,
+    onConfirm: (nombre: String, apellido: String, correo: String, direccion: String, comentarios: String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var retiroEnTienda by remember { mutableStateOf(true) }
+    var nombre by remember { mutableStateOf("") }
+    var apellido by remember { mutableStateOf("") }
+    var correo by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
     var comentarios by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Datos de envío / retiro") },
+        title = { Text("Datos para tu pedido") },
         text = {
             Column {
-                Text("Total a pagar: $${"%.0f".format(total)}")
-
-                Spacer(Modifier.height(12.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Retiro en tienda")
-                    Spacer(Modifier.width(8.dp))
-                    Switch(
-                        checked = retiroEnTienda,
-                        onCheckedChange = { retiroEnTienda = it }
-                    )
-                }
-
-                if (retiroEnTienda) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        "📍 Solo disponible en Mall Plaza Vespucio",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-
-                if (!retiroEnTienda) {
-                    Spacer(Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = direccion,
-                        onValueChange = { direccion = it },
-                        label = { Text("Dirección de envío") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
+                Text("Total a pagar: $${"%.2f".format(total)}")
                 Spacer(Modifier.height(12.dp))
                 OutlinedTextField(
-                    value = telefono,
-                    onValueChange = { telefono = it },
-                    label = { Text("Teléfono (opcional)") },
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = apellido,
+                    onValueChange = { apellido = it },
+                    label = { Text("Apellido") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = correo,
+                    onValueChange = { correo = it },
+                    label = { Text("Correo") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = direccion,
+                    onValueChange = { direccion = it },
+                    label = { Text("Dirección") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = comentarios,
                     onValueChange = { comentarios = it },
@@ -237,7 +238,7 @@ fun CheckoutDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                onConfirm(retiroEnTienda, direccion, telefono, comentarios)
+                onConfirm(nombre, apellido, correo, direccion, comentarios)
             }) {
                 Text("Confirmar pedido")
             }
@@ -248,10 +249,4 @@ fun CheckoutDialog(
             }
         }
     )
-}
-
-
-fun generarNumeroPedidoAleatorio(): String {
-    val numero = (100000..999999).random()
-    return "PED-$numero"
 }

@@ -81,6 +81,14 @@ fun HomeScreen(navController: NavController, isAdmin: Boolean) {
                     Text("👥 Quienes Somos")
                 }
             }
+            if (isAdmin) {
+                Button(
+                    onClick = { navController.navigate("ordenes") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("🛍️ Mis Órdenes")
+                }
+            }
 
             OutlinedButton(
                 onClick = {
