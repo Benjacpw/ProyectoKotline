@@ -12,12 +12,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.avance.viewmodel.UsuariosViewModel
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+    navController: NavHostController,
+    usuariosViewModel: UsuariosViewModel
+) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+
+
+    val usuariosCargados = usuariosViewModel.usuarios.isNotEmpty()
+
+
+    LaunchedEffect(Unit) {
+        usuariosViewModel.cargarUsuarios()
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -35,7 +47,7 @@ fun LoginScreen(navController: NavHostController) {
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("Usuario") },
+                label = { Text("Usuario (correo registrado)") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -56,6 +68,12 @@ fun LoginScreen(navController: NavHostController) {
 
             Button(
                 onClick = {
+
+                    if (!usuariosCargados) {
+                        errorMessage = "Cargando usuarios... intenta en 1 segundo."
+                        return@Button
+                    }
+
                     when {
                         username == "admin" && password == "admin123" -> {
                             errorMessage = ""
@@ -63,20 +81,36 @@ fun LoginScreen(navController: NavHostController) {
                                 popUpTo("login") { inclusive = true }
                             }
                         }
-                        username == "user" && password == "user123" -> {
-                            errorMessage = ""
-                            navController.navigate("home_user") {
-                                popUpTo("login") { inclusive = true }
-                            }
-                        }
+
                         else -> {
-                            errorMessage = "❌ Credenciales incorrectas"
+                            val usuarioEncontrado =
+                                usuariosViewModel.usuarios.find { u ->
+                                    u.email == username && u.contrasena == password
+                                }
+
+                            if (usuarioEncontrado != null) {
+                                errorMessage = ""
+                                navController.navigate("home_user") {
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            } else {
+                                errorMessage = "❌ Usuario o contraseña incorrectos"
+                            }
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Ingresar")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextButton(
+                onClick = { navController.navigate("register") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("¿No tienes cuenta? Crear cuenta")
             }
 
             if (errorMessage.isNotEmpty()) {
@@ -91,5 +125,6 @@ fun LoginScreen(navController: NavHostController) {
 @Composable
 fun LoginScreenPreview() {
     val navController = rememberNavController()
-    LoginScreen(navController = navController)
+    val fakeVm = UsuariosViewModel()
+    LoginScreen(navController = navController, usuariosViewModel = fakeVm)
 }
