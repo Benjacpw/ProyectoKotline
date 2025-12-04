@@ -9,6 +9,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -45,9 +48,7 @@ fun CatalogoScreen(productosViewModel: ProductosViewModel, navController: NavCon
                 .padding(padding)
                 .padding(16.dp)
         ) {
-
             grouped.forEach { (categoriaNombre, productosLista) ->
-
                 item {
                     Text(
                         text = categoriaNombre,
@@ -82,16 +83,15 @@ fun ProductoCatalogoItem(producto: Producto, onClick: () -> Unit) {
             modifier = Modifier.padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-            // Imagen desde URL
             AsyncImage(
                 model = producto.imagen,
                 contentDescription = producto.titulo,
                 modifier = Modifier
-                    .size(90.dp)
-                    .padding(4.dp)
+                    .width(80.dp)
+                    .height(100.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                contentScale = ContentScale.Crop
             )
-
             Column(modifier = Modifier.weight(1f)) {
 
                 Text(producto.titulo, style = MaterialTheme.typography.titleMedium)

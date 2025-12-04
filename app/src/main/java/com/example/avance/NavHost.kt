@@ -22,12 +22,10 @@ fun AppNavigation() {
         composable("register") {
             RegistroScreen(navController, usuariosViewModel)
         }
-        composable("home_admin") {
-            HomeScreen(navController, isAdmin = true)
-        }
         composable("home_user") {
-            HomeScreen(navController, isAdmin = false)
+            HomeScreen(navController)
         }
+
         composable("productos") {
             ProductosScreen(navController)
         }
