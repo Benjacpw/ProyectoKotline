@@ -71,8 +71,8 @@ fun ProductosScreen(navController: NavController) {
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigate("home_admin") {
-                            popUpTo("home_admin") { inclusive = true }
+                        navController.navigate("dashboard_admin") {
+                            popUpTo("dashboard_admin") { inclusive = true }
                         }
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")

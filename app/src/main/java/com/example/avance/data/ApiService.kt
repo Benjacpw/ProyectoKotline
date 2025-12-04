@@ -66,6 +66,11 @@ interface ApiService {
     @GET("api/ordenes")
     suspend fun obtenerTodasOrdenes(): List<Orden>
 
+    @POST("api/ordenes/{id}/estado")
+    suspend fun actualizarEstado(
+        @Path("id") id: Long,
+        @Body estado: String
+    )
 
 
 }

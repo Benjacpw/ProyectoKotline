@@ -68,6 +68,11 @@ fun AppNavigation() {
             OrdenesScreen(navController = navController)
         }
 
+        composable("dashboard_admin") {
+            DashboardAdminScreen(navController)
+        }
+
+
 
     }
 }

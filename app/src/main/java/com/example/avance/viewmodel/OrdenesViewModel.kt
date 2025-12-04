@@ -7,6 +7,7 @@ import com.example.avance.data.Orden
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.example.avance.data.RetrofitInstance
 
 class OrdenesViewModel : ViewModel() {
 
@@ -22,4 +23,23 @@ class OrdenesViewModel : ViewModel() {
             }
         }
     }
+    fun totalVentas(): Int {
+        return _ordenes.value.size
+    }
+
+    fun actualizarEstadoOrden(api: ApiService, id: Long, nuevoEstado: String) {
+        viewModelScope.launch {
+            try {
+                api.actualizarEstado(id, nuevoEstado)
+                cargarTodasOrdenes(api)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 }
+
+
+
+

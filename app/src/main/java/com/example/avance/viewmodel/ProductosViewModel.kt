@@ -61,4 +61,9 @@ class ProductosViewModel : ViewModel() {
             } finally { cargando = false }
         }
     }
+
+    fun totalProductos(): Int {
+        return productos.size
+    }
+
 }

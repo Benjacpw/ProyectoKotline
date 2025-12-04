@@ -25,7 +25,6 @@ fun OrdenesScreen(navController: NavController) {
         viewModel.cargarTodasOrdenes(apiService)
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,17 +56,51 @@ fun OrdenesScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(ordenes) { orden ->
+
+                    var expanded by remember { mutableStateOf(false) }
+                    val estados = listOf("pendiente", "enviado", "completado")
+
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
+
                             Text("🆔 Pedido ID: ${orden.id}", style = MaterialTheme.typography.titleMedium)
                             Text("📅 Fecha: ${orden.fecha}")
                             Text("💰 Total: $${orden.total}")
                             Text("📋 Productos:", style = MaterialTheme.typography.titleSmall)
+
                             orden.productos.forEach { item ->
                                 Text("- ${item.titulo} x${item.qty} = $${item.precio * item.qty}")
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text("📌 Estado actual: ${orden.estado}", style = MaterialTheme.typography.titleMedium)
+                            Box {
+                                Button(onClick = { expanded = true }) {
+                                    Text("Cambiar estado")
+                                }
+
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    estados.forEach { estado ->
+                                        DropdownMenuItem(
+                                            text = { Text(estado) },
+                                            onClick = {
+                                                expanded = false
+                                                viewModel.actualizarEstadoOrden(
+                                                    apiService,
+                                                    orden.id,
+                                                    estado
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

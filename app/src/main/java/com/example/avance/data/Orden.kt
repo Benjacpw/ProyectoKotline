@@ -13,5 +13,6 @@ data class Orden(
     val comuna: String,
     val indicaciones: String,
     val usuarioId: Long,
+    val estado: String,
     val productos: List<OrdenItem>
 )

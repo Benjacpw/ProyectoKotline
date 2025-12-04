@@ -62,6 +62,7 @@ class CarritoViewModel : ViewModel() {
             comuna = comuna,
             indicaciones = indicaciones,
             usuarioId = 0L,
+            estado = "pendiente",
             productos = carrito.value.map {
                 OrdenItem(
                     id = 0L,
