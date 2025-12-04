@@ -112,6 +112,12 @@ fun LoginScreen(
             ) {
                 Text("¿No tienes cuenta? Crear cuenta")
             }
+            TextButton(
+                onClick = { navController.navigate("recuperar_contrasena") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("¿Olvidaste tu contraseña?")
+            }
 
             if (errorMessage.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(10.dp))

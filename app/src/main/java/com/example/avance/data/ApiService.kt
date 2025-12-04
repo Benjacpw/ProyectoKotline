@@ -71,6 +71,9 @@ interface ApiService {
         @Path("id") id: Long,
         @Body estado: String
     )
-
+    @POST("api/usuarios/recuperar")
+    suspend fun recuperarContrasena(
+        @Body solicitud: SolicitudActualizarClave
+    ): RespuestaApi
 
 }

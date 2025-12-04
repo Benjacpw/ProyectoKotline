@@ -69,6 +69,7 @@ fun OrdenesScreen(navController: NavController) {
                             Text("🆔 Pedido ID: ${orden.id}", style = MaterialTheme.typography.titleMedium)
                             Text("📅 Fecha: ${orden.fecha}")
                             Text("💰 Total: $${orden.total}")
+                            Text("👤 Cliente: ${orden.nombre}", style = MaterialTheme.typography.titleMedium)
                             Text("📋 Productos:", style = MaterialTheme.typography.titleSmall)
 
                             orden.productos.forEach { item ->

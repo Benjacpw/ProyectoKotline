@@ -84,7 +84,7 @@ fun DetalleProductoScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("🛍 Agregar al carrito")
+                    Text("🛍️ Agregar al carrito")
                 }
             }
 

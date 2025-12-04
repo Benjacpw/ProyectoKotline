@@ -23,7 +23,7 @@ fun AppNavigation() {
             RegistroScreen(navController, usuariosViewModel)
         }
         composable("home_user") {
-            HomeScreen(navController)
+            HomeScreen(navController, productosViewModel)
         }
 
         composable("productos") {
@@ -69,8 +69,18 @@ fun AppNavigation() {
         composable("dashboard_admin") {
             DashboardAdminScreen(navController)
         }
+        composable("recuperar_contrasena") {
+            RecuperarContrasenaScreen(navController)
+        }
 
-
-
+        composable("detalle/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")?.toLong() ?: 0L
+            DetalleProductoScreen(
+                productoId = id,
+                viewModel = productosViewModel,
+                carritoViewModel = carritoViewModel,
+                navController = navController
+            )
+        }
     }
 }

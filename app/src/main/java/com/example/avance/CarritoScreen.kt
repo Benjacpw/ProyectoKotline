@@ -193,13 +193,16 @@ fun CheckoutDialog(
     var direccion by remember { mutableStateOf("") }
     var comentarios by remember { mutableStateOf("") }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Datos para tu pedido") },
         text = {
             Column {
                 Text("Total a pagar: $${"%.2f".format(total)}")
                 Spacer(Modifier.height(12.dp))
+
                 OutlinedTextField(
                     value = nombre,
                     onValueChange = { nombre = it },
@@ -207,6 +210,7 @@ fun CheckoutDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = apellido,
                     onValueChange = { apellido = it },
@@ -214,6 +218,7 @@ fun CheckoutDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = correo,
                     onValueChange = { correo = it },
@@ -221,6 +226,7 @@ fun CheckoutDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = direccion,
                     onValueChange = { direccion = it },
@@ -228,17 +234,46 @@ fun CheckoutDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = comentarios,
                     onValueChange = { comentarios = it },
                     label = { Text("Comentarios (opcional)") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                SnackbarHost(hostState = snackbarHostState)
             }
         },
         confirmButton = {
             TextButton(onClick = {
+                when {
+                    nombre.isBlank() -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("⚠️ Debes ingresar un nombre.")
+                        }
+                        return@TextButton
+                    }
+                    apellido.isBlank() -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("⚠️ Debes ingresar un apellido.")
+                        }
+                        return@TextButton
+                    }
+                    correo.isBlank() || !correo.contains("@") -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("⚠️ Ingresa un correo válido.")
+                        }
+                        return@TextButton
+                    }
+                    direccion.isBlank() -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("⚠️ Debes ingresar una dirección.")
+                        }
+                        return@TextButton
+                    }
+                }
                 onConfirm(nombre, apellido, correo, direccion, comentarios)
+
             }) {
                 Text("Confirmar pedido")
             }
@@ -250,3 +285,5 @@ fun CheckoutDialog(
         }
     )
 }
+
+
