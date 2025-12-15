@@ -9,4 +9,6 @@ Endpoints Usados: GET /api/categorias, GET /api/categorias/{id}, POST /api/categ
 Instrucciones para ejecutar el proyecto: Clonar el proyecto en Android Studios, prender la instancia EC2 y hacer correr la api, en el retrofitinstance del proyecto poner la ip publica de la instancia EC2.
 LINK APK: https://drive.google.com/drive/u/0/folders/1xQGEojO6LH5JFcJyjO0A4U9gn32k_AQc
 LINK API Y PROYECTO KOTLIN: https://drive.google.com/drive/folders/1qqzoaXyXgAy-8I37luYI9nk80D4A4kXS?usp=sharing
-COMMITS: 
+COMMITS: https://drive.google.com/drive/folders/1n2PZKlAbE7pgEkPeGPb81IrgIiwuflVb?usp=sharing
+PD: LOS COMMITS HECHOS POR BENJAMIN CONCHA QUE HIZO EL PERO SUBI YO BENJAMIN OLAVARRIA SON Agregado pestaña de ordenesscreen y se crean ordenes desde el carrito, Agregado registro de usuarios, Terminado Carrito y productos agregados al carrito, Arreglado el error del crasheo al iniciar sesion, Home arreglado, con detalles de producto y cambios en RecuperarContrasenaScreen.kt.
+
