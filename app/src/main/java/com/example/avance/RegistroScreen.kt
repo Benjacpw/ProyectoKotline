@@ -8,12 +8,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.avance.data.UsuarioCreate
+import com.example.avance.data.UsuarioPreferences
 import com.example.avance.viewmodel.UsuariosViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,8 +25,14 @@ fun RegistroScreen(
     usuariosViewModel: UsuariosViewModel
 ) {
 
+
+    val context = LocalContext.current
+    val usuarioPrefs = remember { UsuarioPreferences(context) }
+    val scope = rememberCoroutineScope()
+
+
     var nombre by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }          
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmarPassword by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
@@ -57,6 +66,7 @@ fun RegistroScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Text("Regístrate", style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -64,7 +74,6 @@ fun RegistroScreen(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre completo") },
-                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -74,7 +83,6 @@ fun RegistroScreen(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Correo electrónico") },
-                singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -85,7 +93,6 @@ fun RegistroScreen(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña") },
-                singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -96,7 +103,6 @@ fun RegistroScreen(
                 value = confirmarPassword,
                 onValueChange = { confirmarPassword = it },
                 label = { Text("Confirmar contraseña") },
-                singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -107,7 +113,6 @@ fun RegistroScreen(
                 value = telefono,
                 onValueChange = { telefono = it },
                 label = { Text("Teléfono (opcional)") },
-                singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -118,7 +123,6 @@ fun RegistroScreen(
                 value = region,
                 onValueChange = { region = it },
                 label = { Text("Región") },
-                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -128,23 +132,27 @@ fun RegistroScreen(
                 value = comuna,
                 onValueChange = { comuna = it },
                 label = { Text("Comuna") },
-                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Button(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading,
                 onClick = {
+
                     when {
                         nombre.isBlank() || email.isBlank() || password.isBlank() || confirmarPassword.isBlank() -> {
                             errorMessage = "Completa los campos obligatorios."
                             successMessage = ""
                         }
+
                         password != confirmarPassword -> {
                             errorMessage = "Las contraseñas no coinciden."
                             successMessage = ""
                         }
+
                         else -> {
                             errorMessage = ""
                             successMessage = ""
@@ -161,18 +169,26 @@ fun RegistroScreen(
                                 comuna = comuna
                             )
 
+
                             usuariosViewModel.crearUsuario(nuevoUsuario)
 
-                            isLoading = false
-                            successMessage = "Cuenta creada correctamente. Ahora puedes iniciar sesión."
 
+                            scope.launch {
+                                usuarioPrefs.guardarUsuario(
+                                    nombre = nombre,
+                                    apellido = "",
+                                    correo = email,
+                                    direccion = "$region, $comuna"
+                                )
+                            }
+
+                            isLoading = false
+                            successMessage = "Cuenta creada correctamente."
 
                             navController.popBackStack()
                         }
                     }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
+                }
             ) {
                 Text(if (isLoading) "Creando cuenta..." else "Crear cuenta")
             }

@@ -9,10 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.avance.data.CarritoItem
 import com.example.avance.data.ApiService
+import com.example.avance.data.UsuarioPreferences
+import com.example.avance.data.UsuarioData
 import com.example.avance.viewmodel.CarritoViewModel
 import kotlinx.coroutines.launch
 
@@ -24,12 +27,17 @@ fun CarritoScreen(
     apiService: ApiService
 ) {
     val carrito by viewModel.carrito.collectAsState()
-    val total = carrito.sumOf { it.precio * it.cantidad }
+
+    val total = carrito.fold(0.0) { acc, item ->
+        acc + (item.precio * item.cantidad)
+    }
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
     var mostrarCheckout by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val userPrefs = remember { UsuarioPreferences(context) }
 
     Scaffold(
         topBar = {
@@ -52,7 +60,7 @@ fun CarritoScreen(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Tu carrito está vacío 🛍️", style = MaterialTheme.typography.titleMedium)
+                Text("Tu carrito está vacío 🛍️")
             }
         } else {
             Column(
@@ -78,7 +86,7 @@ fun CarritoScreen(
                                 } else {
                                     viewModel.eliminar(item)
                                     scope.launch {
-                                        snackbarHostState.showSnackbar("🗑 Producto eliminado del carrito")
+                                        snackbarHostState.showSnackbar("Producto eliminado")
                                     }
                                 }
                             }
@@ -86,16 +94,10 @@ fun CarritoScreen(
                     }
                 }
 
-                Divider()
                 Spacer(Modifier.height(8.dp))
-
-                Text(
-                    "💰 Total: $${"%.2f".format(total)}",
-                    style = MaterialTheme.typography.titleLarge
-                )
+                Text("💰 Total: $${"%.2f".format(total)}")
 
                 Spacer(Modifier.height(12.dp))
-
                 Button(
                     onClick = { mostrarCheckout = true },
                     modifier = Modifier.fillMaxWidth()
@@ -109,6 +111,7 @@ fun CarritoScreen(
     if (mostrarCheckout) {
         CheckoutDialog(
             total = total,
+            userPrefs = userPrefs,
             onConfirm = { nombre, apellido, correo, direccion, comentarios ->
                 viewModel.crearOrden(
                     nombre = nombre,
@@ -120,16 +123,16 @@ fun CarritoScreen(
                     comuna = "",
                     indicaciones = comentarios,
                     apiService = apiService,
-                    onSuccess = { resultado ->
+                    onSuccess = {
                         mostrarCheckout = false
                         scope.launch {
-                            snackbarHostState.showSnackbar("✅ Pedido creado con ID: ${resultado.id}")
+                            snackbarHostState.showSnackbar("Pedido creado correctamente")
                         }
                         viewModel.limpiar()
                     },
                     onError = { error ->
                         scope.launch {
-                            snackbarHostState.showSnackbar("❌ Error: $error")
+                            snackbarHostState.showSnackbar("Error: $error")
                         }
                     }
                 )
@@ -148,33 +151,26 @@ fun CarritoItemView(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .padding(vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
             Column(modifier = Modifier.weight(1f)) {
-                Text(item.nombre, style = MaterialTheme.typography.titleMedium)
-                Text("Precio unitario: $${item.precio}")
-                Text("Subtotal: $${item.cantidad * item.precio}")
+                Text(item.nombre)
+                Text("Precio: $${item.precio}")
+                Text("Subtotal: $${item.precio * item.cantidad}")
             }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onRemove) {
-                    Icon(Icons.Filled.Remove, contentDescription = "Quitar uno")
+                    Icon(Icons.Filled.Remove, contentDescription = null)
                 }
                 Text("${item.cantidad}")
                 IconButton(onClick = onAdd) {
-                    Icon(Icons.Filled.Add, contentDescription = "Agregar uno")
+                    Icon(Icons.Filled.Add, contentDescription = null)
                 }
             }
         }
@@ -184,96 +180,42 @@ fun CarritoItemView(
 @Composable
 fun CheckoutDialog(
     total: Double,
-    onConfirm: (nombre: String, apellido: String, correo: String, direccion: String, comentarios: String) -> Unit,
+    userPrefs: UsuarioPreferences,
+    onConfirm: (String, String, String, String, String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val usuario by userPrefs.usuarioFlow.collectAsState(
+        initial = UsuarioData("", "", "", "")
+    )
+
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
     var comentarios by remember { mutableStateOf("") }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    LaunchedEffect(usuario) {
+        nombre = usuario.nombre
+        apellido = usuario.apellido
+        correo = usuario.correo
+        direccion = usuario.direccion
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        title = { Text("Total a pagar: $${"%.2f".format(total)}") },
         text = {
             Column {
-                Text("Total a pagar: $${"%.2f".format(total)}")
-                Spacer(Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = apellido,
-                    onValueChange = { apellido = it },
-                    label = { Text("Apellido") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = correo,
-                    onValueChange = { correo = it },
-                    label = { Text("Correo") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = direccion,
-                    onValueChange = { direccion = it },
-                    label = { Text("Dirección") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = comentarios,
-                    onValueChange = { comentarios = it },
-                    label = { Text("Comentarios (opcional)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                SnackbarHost(hostState = snackbarHostState)
+                OutlinedTextField(nombre, { nombre = it }, label = { Text("Nombre") })
+                OutlinedTextField(apellido, { apellido = it }, label = { Text("Apellido") })
+                OutlinedTextField(correo, { correo = it }, label = { Text("Correo") })
+                OutlinedTextField(direccion, { direccion = it }, label = { Text("Dirección") })
+                OutlinedTextField(comentarios, { comentarios = it }, label = { Text("Comentarios") })
             }
         },
         confirmButton = {
             TextButton(onClick = {
-                when {
-                    nombre.isBlank() -> {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("⚠️ Debes ingresar un nombre.")
-                        }
-                        return@TextButton
-                    }
-                    apellido.isBlank() -> {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("⚠️ Debes ingresar un apellido.")
-                        }
-                        return@TextButton
-                    }
-                    correo.isBlank() || !correo.contains("@") -> {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("⚠️ Ingresa un correo válido.")
-                        }
-                        return@TextButton
-                    }
-                    direccion.isBlank() -> {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("⚠️ Debes ingresar una dirección.")
-                        }
-                        return@TextButton
-                    }
-                }
                 onConfirm(nombre, apellido, correo, direccion, comentarios)
-
             }) {
                 Text("Confirmar pedido")
             }
@@ -285,5 +227,3 @@ fun CheckoutDialog(
         }
     )
 }
-
-

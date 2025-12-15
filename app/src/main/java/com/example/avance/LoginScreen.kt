@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -131,6 +132,10 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     val navController = rememberNavController()
-    val fakeVm = UsuariosViewModel()
-    LoginScreen(navController = navController, usuariosViewModel = fakeVm)
+    val fakeVm: UsuariosViewModel = viewModel()
+    LoginScreen(
+        navController = navController,
+        usuariosViewModel = fakeVm
+    )
 }
+
